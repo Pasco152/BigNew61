@@ -102,6 +102,14 @@
             // xhr.onload = function() {
             //     console.log(xhr.responseText)
             // };
+
+            // 退出登录
+            $('.logout').on('click',function () {
+                // 清除token
+                localStorage.removeItem('token')
+                // 返回登录页面
+                window.location.href = './login.html'
+            })
         })
     </script>
 </body>
