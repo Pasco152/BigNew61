@@ -11,7 +11,11 @@
   <link rel="stylesheet" href="css/iconfont.css">
   <link rel="stylesheet" href="css/main.css">
   <script src="./libs/jquery-1.12.4.min.js"></script>
+  <!-- 导入模板引擎js页面 -->
   <script src="./libs/template-web.js"></script>
+  <!-- 导包分页插件 -->
+  <script src="../插件的应用/分页插件/bootstrap/js/bootstrap.min.js"></script>
+  <script src="../插件的应用/分页插件/jquery.twbsPagination.js"></script>
 </head>
 
 <body>
@@ -142,7 +146,7 @@
         </tbody>
       </table>
       <div class="row text-center">
-        <ul class="pagination pagination-sm">
+        <!-- <ul class="pagination pagination-sm">
           <li class="page-item first disabled"><a href="#" class="page-link">首页</a></li>
           <li class="page-item prev disabled"><a href="#" class="page-link">上一页</a></li>
           <li class="page-item active"><a href="#" class="page-link">1</a></li>
@@ -154,12 +158,101 @@
           <li class="page-item"><a href="#" class="page-link">7</a></li>
           <li class="page-item next"><a href="#" class="page-link">下一页</a></li>
           <li class="page-item last"><a href="#" class="page-link">尾页</a></li>
-        </ul>
+        </ul> -->
         <ul id="pagination" class="pagination-sm"></ul>
       </div>
 
     </div>
   </div>
+  <script id="comment_list" type="text/html">
+    {{each data.data v}}
+    <tr>
+      <td>{{v.author}}</td>
+      <td>{{v.content}}</td>
+      <td>{{v.title}}</td>
+      <td>{{v.date}}{{v.time}}</td>
+      <td>{{v.state}}</td>
+      <td class="text-center">
+        {{if v.state == '待审核'}}
+        <a data-id="{{v.id}}" data-url="comment_pass" href="javascript:void(0);" class="btn btn-info btn-xs btn-pass">批准</a>
+        {{else if v.state == '已通过'}}
+        <a data-id="{{v.id}}" data-url="comment_reject" href="javascript:void(0);" class="btn btn-warning btn-xs btn-reject">拒绝</a>
+        {{/if}}
+        <a data-id="{{v.id}}" data-url="comment_delete" href="javascript:void(0);" class="btn btn-danger btn-xs btn-delete">删除</a>
+      </td>
+    </tr>
+    {{/each}}
+  </script>
+  <script src="./libs/http.js"></script>
+  <script>
+    // 入口函数
+    $(function () {
+      // 进入页面加载所有评论数据
+      $.ajax({
+        url: BigNew.comment_list,
+        type: 'get',
+        dataType: 'json',
+        data: {
+          page: 1,
+          perpage: 10
+        },
+        success: function (backData) {
+          console.log(backData);
+          $('table>tbody').html(template('comment_list', backData))
+          //分页初始化
+          $('#pagination').twbsPagination({
+            totalPages: backData.data.totalPage,// 总页数
+            startPage: 1,// 起始页数
+            visiblePages: 10,// 当前页面显示几页
+            first: '首页',
+            prev: '上一页',
+            next: '下一页',
+            last: '尾页',
+            loop: true,
+            onPageClick: function (event, page) {
+              $('#page-content').text('Page ' + page);
+              getArticlelist(page)
+            }
+          });
+        }
+      });
+      function getArticlelist(currentPage) {
+        $.ajax({
+          url: BigNew.comment_list,
+          type: 'get',
+          dataType: 'json',
+          data: {
+            page: currentPage,
+            perpage: 10
+          },
+          success: function (backData) {
+            console.log(backData);
+            // 模板引擎渲染页面
+            $('table>tbody').html(template('comment_list', backData))
+          }
+        });
+      }
+      // 设置批准拒绝删除事件
+      $('table>tbody').on('click','.btn-pass,.btn-reject,.btn-delete',function () {
+        // console.log(123);
+        $.ajax({
+          url:BigNew[$(this).attr('data-url')],
+          type:'post',
+          dataType:'json',
+          data:{
+            id: $(this).attr('data-id')
+          },
+          success: function(backData){
+            console.log(backData);
+            if (backData.code == 200) {
+              alert(backData.msg);
+              window.location.reload()
+            }
+          }
+        });
+      })
+    })
+  </script>
 </body>
 
 </html>

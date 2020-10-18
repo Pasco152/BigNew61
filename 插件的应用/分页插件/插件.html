@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0,user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <!-- 导包 -->
+    <script src="./分页插件/bootstrap/js/jquery-1.12.4.min.js"></script>
+    <script src="./分页插件/bootstrap/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="./分页插件/bootstrap/css/bootstrap.min.css">
+    <script src="./分页插件/jquery.twbsPagination.js"></script>
+</head>
+
+<body>
+    <!-- html框架 -->
+    <ul id="pagination" class="pagination-sm"></ul>
+    <br>
+    <button id="btn">筛选</button>
+
+    <script>
+        //js初始化
+        $('#pagination').twbsPagination({
+            totalPages: 35,// 总页数
+            startPage: 1,// 起始页数
+            visiblePages: 7,// 当前页面显示几页
+            first: '首页',
+            prev: '上一页',
+            next: '下一页',
+            last: '尾页',
+            loop: true,
+            onPageClick: function (event, page) {
+                $('#page-content').text('Page ' + page);
+            }
+        });
+
+        // 设置动态分页
+        $('#btn').click(function () {
+            let num = Math.ceil(Math.random()*100)
+            // 销毁
+            $('#pagination').twbsPagination('destroy');
+            $('#pagination').twbsPagination({
+                totalPages: num,// 总页数
+                startPage: 1,// 起始页数
+                visiblePages: 7,// 当前页面显示几页
+                first: '首页',
+                prev: '上一页',
+                next: '下一页',
+                last: '尾页',
+                loop: true,
+                onPageClick: function (event, page) {
+                    $('#page-content').text('Page ' + page);
+                }
+            });
+        })
+    </script>
+</body>
+
+</html>
